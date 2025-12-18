@@ -222,6 +222,7 @@ jobs:
                   sudo npm i -g grunt-cli
 
             - name: 'Write secrets'
+              if: ${{ github.repository == 'keeweb/keeweb' }}
               env:
                   CODESIGN: ${{ secrets.CODESIGN }}
                   APPLE_DEPLOY_PASSWORD: ${{ secrets.APPLE_DEPLOY_PASSWORD }}
@@ -234,6 +235,7 @@ jobs:
                   echo "$APPLE_PROVISIONING_PROFILE" | base64 -d > keys/keeweb.provisionprofile
 
             - name: 'Import certificates'
+              if: ${{ github.repository == 'keeweb/keeweb' }}
               uses: keeweb/import-codesign-certs@v1
               with:
                   p12-file-base64: ${{ secrets.APPLE_CERTIFICATE }}
@@ -311,19 +313,7 @@ jobs:
 
             - name: 'Grunt'
               run: |
-                  grunt desktop-win32 ${{ github.repository != 'keeweb/keeweb' && '--skip-sign' || '' }}
-
-            - name: 'Upload ia32 exe artifact'
-              uses: actions/upload-artifact@v4
-              with:
-                  name: KeeWeb-${{ steps.get_tag.outputs.tag }}.win.ia32.exe
-                  path: dist/desktop/KeeWeb-${{ steps.get_tag.outputs.tag }}.win.ia32.exe
-
-            - name: 'Upload ia32 zip artifact'
-              uses: actions/upload-artifact@v4
-              with:
-                  name: KeeWeb-${{ steps.get_tag.outputs.tag }}.win.ia32.zip
-                  path: dist/desktop/KeeWeb-${{ steps.get_tag.outputs.tag }}.win.ia32.zip
+                  grunt desktop-win32-x64 ${{ github.repository != 'keeweb/keeweb' && '--skip-sign' || '' }}
 
             - name: 'Upload x64 exe artifact'
               uses: actions/upload-artifact@v4
@@ -336,18 +326,6 @@ jobs:
               with:
                   name: KeeWeb-${{ steps.get_tag.outputs.tag }}.win.x64.zip
                   path: dist/desktop/KeeWeb-${{ steps.get_tag.outputs.tag }}.win.x64.zip
-
-            - name: 'Upload arm64 exe artifact'
-              uses: actions/upload-artifact@v4
-              with:
-                  name: KeeWeb-${{ steps.get_tag.outputs.tag }}.win.arm64.exe
-                  path: dist/desktop/KeeWeb-${{ steps.get_tag.outputs.tag }}.win.arm64.exe
-
-            - name: 'Upload arm64 zip artifact'
-              uses: actions/upload-artifact@v4
-              with:
-                  name: KeeWeb-${{ steps.get_tag.outputs.tag }}.win.arm64.zip
-                  path: dist/desktop/KeeWeb-${{ steps.get_tag.outputs.tag }}.win.arm64.zip
 
     # #
     #   Job › Publish
@@ -438,18 +416,6 @@ jobs:
                   name: KeeWeb-${{ steps.get_tag.outputs.tag }}.mac.arm64.dmg
                   path: assets
 
-            - name: 'Download win32.ia32.exe artifact'
-              uses: actions/download-artifact@v4
-              with:
-                  name: KeeWeb-${{ steps.get_tag.outputs.tag }}.win.ia32.exe
-                  path: assets
-
-            - name: 'Download win32.ia32.zip artifact'
-              uses: actions/download-artifact@v4
-              with:
-                  name: KeeWeb-${{ steps.get_tag.outputs.tag }}.win.ia32.zip
-                  path: assets
-
             - name: 'Download win32.x64.exe artifact'
               uses: actions/download-artifact@v4
               with:
@@ -460,18 +426,6 @@ jobs:
               uses: actions/download-artifact@v4
               with:
                   name: KeeWeb-${{ steps.get_tag.outputs.tag }}.win.x64.zip
-                  path: assets
-
-            - name: 'Download win32.arm64.exe artifact'
-              uses: actions/download-artifact@v4
-              with:
-                  name: KeeWeb-${{ steps.get_tag.outputs.tag }}.win.arm64.exe
-                  path: assets
-
-            - name: 'Download win32.arm64.zip artifact'
-              uses: actions/download-artifact@v4
-              with:
-                  name: KeeWeb-${{ steps.get_tag.outputs.tag }}.win.arm64.zip
                   path: assets
 
             - name: 'Zip html'
