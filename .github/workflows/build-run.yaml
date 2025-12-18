@@ -169,11 +169,63 @@ jobs:
               run: |
                   npm i -g grunt-cli
 
+            - name: 'Debug Environment Info'
+              run: |
+                  echo "============================================"
+                  echo "=== DEBUG: Environment Information ==="
+                  echo "============================================"
+                  echo ""
+                  echo "=== Node.js Version ==="
+                  node --version
+                  echo ""
+                  echo "=== NPM Version ==="
+                  npm --version
+                  echo ""
+                  echo "=== Grunt CLI Version ==="
+                  grunt --version
+                  echo ""
+                  echo "=== process.execArgv ==="
+                  node -e "console.log('process.execArgv:', JSON.stringify(process.execArgv))"
+                  echo ""
+                  echo "=== process.argv ==="
+                  node -e "console.log('process.argv:', JSON.stringify(process.argv))"
+                  echo ""
+                  echo "=== NODE_OPTIONS environment variable ==="
+                  echo "NODE_OPTIONS: $env:NODE_OPTIONS"
+                  echo ""
+                  echo "=== NODE_DEBUG environment variable ==="
+                  echo "NODE_DEBUG: $env:NODE_DEBUG"
+                  echo ""
+                  echo "=== All NODE_* environment variables ==="
+                  Get-ChildItem env: | Where-Object { $_.Name -like "NODE*" } | Format-Table -AutoSize
+                  echo ""
+                  echo "=== nopt version (project local) ==="
+                  node -e "try { console.log(require('./node_modules/nopt/package.json').version) } catch(e) { console.log('Not found:', e.message) }"
+                  echo ""
+                  echo "=== grunt version (project local) ==="
+                  node -e "try { console.log(require('./node_modules/grunt/package.json').version) } catch(e) { console.log('Not found:', e.message) }"
+                  echo ""
+                  echo "=== grunt-legacy-util version ==="
+                  node -e "try { console.log(require('./node_modules/grunt-legacy-util/package.json').version) } catch(e) { console.log('Not found:', e.message) }"
+                  echo ""
+                  echo "=== grunt-contrib-compress version ==="
+                  node -e "try { console.log(require('./node_modules/grunt-contrib-compress/package.json').version) } catch(e) { console.log('Not found:', e.message) }"
+                  echo ""
+                  echo "=== archiver version ==="
+                  node -e "try { console.log(require('./node_modules/archiver/package.json').version) } catch(e) { console.log('Not found:', e.message) }"
+                  echo ""
+                  echo "=== Windows OS Info ==="
+                  Get-ComputerInfo | Select-Object WindowsVersion, WindowsBuildLabEx, OsArchitecture
+                  echo ""
+                  echo "============================================"
+                  echo "=== END DEBUG INFO ==="
+                  echo "============================================"
+
             - name: 'Grunt'
               env:
                   NODE_OPTIONS: ''
               run: |
-                  grunt desktop-win32 --skip-sign
+                  grunt desktop-win32 --skip-sign --verbose
 
             - name: 'Upload x64 exe artifact'
               uses: actions/upload-artifact@v4
