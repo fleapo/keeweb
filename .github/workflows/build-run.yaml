@@ -219,7 +219,7 @@ jobs:
 
             - name: 'Install grunt-appdmg'
               run: |
-                  npm i --no-save --no-package-lock github:keeweb/grunt-appdmg#874ad83
+                  npm i --no-save --no-package-lock --legacy-peer-deps github:keeweb/grunt-appdmg#874ad83
 
             - name: 'Install grunt'
               run: |
