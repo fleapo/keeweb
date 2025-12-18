@@ -651,6 +651,20 @@ module.exports = function (grunt) {
                 src: 'tmp/desktop/KeeWeb Installer.app'
             }
         },
+        'osx-adhoc-sign': {
+            options: {
+                deep: true
+            },
+            'desktop-x64': {
+                src: 'tmp/desktop/KeeWeb-darwin-x64/KeeWeb.app'
+            },
+            'desktop-arm64': {
+                src: 'tmp/desktop/KeeWeb-darwin-arm64/KeeWeb.app'
+            },
+            'installer': {
+                src: 'tmp/desktop/KeeWeb Installer.app'
+            }
+        },
         notarize: {
             options: {
                 appBundleId: 'net.antelle.keeweb',

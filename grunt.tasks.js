@@ -45,8 +45,8 @@ module.exports = function (grunt) {
         'copy:native-messaging-host-darwin-x64',
         'copy:native-modules-darwin-arm64',
         'copy:native-messaging-host-darwin-arm64',
-        sign ? 'osx-sign:desktop-x64' : 'noop',
-        sign ? 'osx-sign:desktop-arm64' : 'noop',
+        sign ? 'osx-sign:desktop-x64' : 'osx-adhoc-sign:desktop-x64',
+        sign ? 'osx-sign:desktop-arm64' : 'osx-adhoc-sign:desktop-arm64',
         sign ? 'notarize:desktop-x64' : 'noop',
         sign ? 'notarize:desktop-arm64' : 'noop'
     ]);
@@ -54,7 +54,7 @@ module.exports = function (grunt) {
     grunt.registerTask('build-darwin-installer', [
         'osacompile:installer',
         'copy:darwin-installer-icon',
-        sign ? 'osx-sign:installer' : 'noop'
+        sign ? 'osx-sign:installer' : 'osx-adhoc-sign:installer'
     ]);
 
     grunt.registerTask('build-desktop-executables-win32', [

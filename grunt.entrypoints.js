@@ -63,7 +63,8 @@ module.exports = function(grunt) {
         'build-darwin-installer',
         'copy:desktop-darwin-installer-helper-x64',
         'copy:native-modules-darwin-x64',
-        'copy:native-messaging-host-darwin-x64'
+        'copy:native-messaging-host-darwin-x64',
+        'osx-adhoc-sign:desktop-x64'
     ]);
 
     grunt.registerTask('dev-desktop-darwin-signed', 'Build a signed macOS app in dev environment', [

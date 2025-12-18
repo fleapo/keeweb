@@ -526,6 +526,7 @@ jobs:
                   body_path: keeweb/tmp/release-body.md
 
             - name: 'Checkout gh-pages'
+              if: ${{ github.repository == 'keeweb/keeweb' }}
               uses: actions/checkout@v4
               with:
                   ref: gh-pages
@@ -533,6 +534,7 @@ jobs:
                   fetch-depth: 0
 
             - name: 'Commit dist to gh-pages'
+              if: ${{ github.repository == 'keeweb/keeweb' }}
               working-directory: gh-pages
               run: |
                   git rm -r '*'
@@ -546,6 +548,7 @@ jobs:
                   git commit -am v${{ steps.get_tag.outputs.tag }}
 
             - name: 'Push gh-pages'
+              if: ${{ github.repository == 'keeweb/keeweb' }}
               uses: keeweb/github-push-action@master
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -553,6 +556,7 @@ jobs:
                   directory: gh-pages
 
             - name: 'Restore git mtime'
+              if: ${{ github.repository == 'keeweb/keeweb' }}
               working-directory: gh-pages
               run: |
                   python3 ../keeweb/.github/actions/scripts/git-restore-mtime.py
@@ -567,6 +571,10 @@ jobs:
               env:
                   CF_TOKEN: ${{ secrets.CF_TOKEN }}
               run: |
+                  if [ -z "$CF_TOKEN" ]; then
+                    echo "CF_TOKEN is not configured, skipping CloudFlare cache purge."
+                    exit 0
+                  fi
                   curl -sS -X POST "https://api.cloudflare.com/client/v4/zones/dbda8e7e454d23edb08d4bc3b3f6f872/purge_cache" \
                     -H "Authorization: Bearer $CF_TOKEN" \
                     -H "Content-Type: application/json" \
