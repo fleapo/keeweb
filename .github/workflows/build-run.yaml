@@ -22,13 +22,6 @@ on:
         tags: [ '*' ]
 
 # #
-#   Environment Vars
-# #
-
-env:
-    NODE_OPTIONS: '--openssl-legacy-provider'
-
-# #
 #   Jobs
 # #
 
@@ -63,10 +56,14 @@ jobs:
                   npm ci
 
             - name: 'Test'
+              env:
+                  NODE_OPTIONS: '--openssl-legacy-provider'
               run: |
                   npm test
 
             - name: 'Grunt'
+              env:
+                  NODE_OPTIONS: '--openssl-legacy-provider'
               run: |
                   grunt
 
