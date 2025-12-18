@@ -32,21 +32,15 @@ module.exports = function (grunt) {
         'copy:native-messaging-host-linux-x64'
     ]);
 
+    // Modified: Only build darwin-arm64
     grunt.registerTask('build-desktop-executables-darwin', [
-        'electron:darwin-x64',
         'electron:darwin-arm64',
-        'electron-patch:darwin-x64',
         'electron-patch:darwin-arm64',
         'build-darwin-installer',
-        'copy:desktop-darwin-installer-helper-x64',
         'copy:desktop-darwin-installer-helper-arm64',
-        'copy:native-modules-darwin-x64',
-        'copy:native-messaging-host-darwin-x64',
         'copy:native-modules-darwin-arm64',
         'copy:native-messaging-host-darwin-arm64',
-        sign ? 'osx-sign:desktop-x64' : 'noop',
         sign ? 'osx-sign:desktop-arm64' : 'noop',
-        sign ? 'notarize:desktop-x64' : 'noop',
         sign ? 'notarize:desktop-arm64' : 'noop'
     ]);
 
@@ -56,22 +50,13 @@ module.exports = function (grunt) {
         sign ? 'osx-sign:installer' : 'noop'
     ]);
 
+    // Modified: Only build win32-x64
     grunt.registerTask('build-desktop-executables-win32', [
         'electron:win32-x64',
-        'electron:win32-ia32',
-        'electron:win32-arm64',
         'electron-patch:win32-x64',
-        'electron-patch:win32-ia32',
-        'electron-patch:win32-arm64',
         'copy:native-modules-win32-x64',
-        'copy:native-modules-win32-ia32',
-        'copy:native-modules-win32-arm64',
         'copy:native-messaging-host-win32-x64',
-        'copy:native-messaging-host-win32-ia32',
-        'copy:native-messaging-host-win32-arm64',
-        sign ? 'sign-exe:win32-build-x64' : 'noop',
-        sign ? 'sign-exe:win32-build-ia32' : 'noop',
-        sign ? 'sign-exe:win32-build-arm64' : 'noop'
+        sign ? 'sign-exe:win32-build-x64' : 'noop'
     ]);
 
     grunt.registerTask('build-desktop-executables', [
@@ -82,10 +67,9 @@ module.exports = function (grunt) {
 
     grunt.registerTask('build-desktop-archives-linux', ['compress:linux-x64']);
 
+    // Modified: Only compress win32-x64
     grunt.registerTask('build-desktop-archives-win32', [
-        'compress:win32-x64',
-        'compress:win32-ia32',
-        'compress:win32-arm64'
+        'compress:win32-x64'
     ]);
 
     grunt.registerTask('build-desktop-archives', [
@@ -93,24 +77,16 @@ module.exports = function (grunt) {
         'build-desktop-archives-win32'
     ]);
 
-    grunt.registerTask('build-desktop-dist-darwin', ['appdmg:x64', 'appdmg:arm64']);
+    // Modified: Only build arm64 dmg
+    grunt.registerTask('build-desktop-dist-darwin', ['appdmg:arm64']);
 
+    // Modified: Only build win32-x64 installer
     grunt.registerTask('build-desktop-dist-win32', [
         'nsis:win32-un-x64',
-        'nsis:win32-un-ia32',
-        'nsis:win32-un-arm64',
         sign ? 'sign-exe:win32-uninst-x64' : 'noop',
-        sign ? 'sign-exe:win32-uninst-ia32' : 'noop',
-        sign ? 'sign-exe:win32-uninst-arm64' : 'noop',
         'nsis:win32-x64',
-        'nsis:win32-ia32',
-        'nsis:win32-arm64',
         sign ? 'sign-exe:win32-installer-x64' : 'noop',
-        sign ? 'sign-exe:win32-installer-ia32' : 'noop',
-        sign ? 'sign-exe:win32-installer-arm64' : 'noop',
-        'copy:desktop-win32-dist-x64',
-        'copy:desktop-win32-dist-ia32',
-        'copy:desktop-win32-dist-arm64'
+        'copy:desktop-win32-dist-x64'
     ]);
 
     grunt.registerTask('build-desktop-dist-linux', [
