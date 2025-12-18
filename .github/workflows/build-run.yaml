@@ -450,38 +450,45 @@ jobs:
               run: mkdir -p keeweb/dist/desktop && cp assets/* keeweb/dist/desktop
 
             - name: 'Write secrets'
-              if: ${{ secrets.PRIVATE_KEY != '' && secrets.KEEWEB_SIGN != '' }}
               env:
                   PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
                   KEEWEB_SIGN: ${{ secrets.KEEWEB_SIGN }}
               working-directory: keeweb
               run: |
+                  if [ -z "$PRIVATE_KEY" ] || [ -z "$KEEWEB_SIGN" ]; then
+                    echo "Signing secrets not configured, skipping signatures generation."
+                    exit 0
+                  fi
                   mkdir -p keys
                   printf '%s' "$PRIVATE_KEY" > keys/private-key.pem
                   printf '%s' "$KEEWEB_SIGN" > keys/keeweb-sign.json
 
             - name: 'Grunt'
-              if: ${{ secrets.PRIVATE_KEY != '' && secrets.KEEWEB_SIGN != '' }}
+              if: ${{ hashFiles('keeweb/keys/private-key.pem') != '' && hashFiles('keeweb/keys/keeweb-sign.json') != '' }}
               working-directory: keeweb
               run: |
                   grunt finish-release
 
             - name: 'Copy signatures to assets'
-              if: ${{ secrets.PRIVATE_KEY != '' && secrets.KEEWEB_SIGN != '' }}
+              if: ${{ hashFiles('keeweb/dist/desktop/Verify.sign.sha256') != '' }}
               run: |
                   cp keeweb/dist/desktop/Verify.sign.sha256 assets
 
             - name: 'Copy checksums to assets'
-              if: ${{ secrets.PRIVATE_KEY != '' && secrets.KEEWEB_SIGN != '' }}
+              if: ${{ hashFiles('keeweb/dist/desktop/Verify.sha256') != '' }}
               run: |
                   cp keeweb/dist/desktop/Verify.sha256 assets
 
             - name: 'Login to DockerHub Registry'
-              if: ${{ github.repository == 'keeweb/keeweb' && secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_ACCESS_TOKEN != '' }}
+              if: ${{ github.repository == 'keeweb/keeweb' }}
               env:
                   DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
                   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
               run: |
+                  if [ -z "$DOCKERHUB_USERNAME" ] || [ -z "$DOCKERHUB_ACCESS_TOKEN" ]; then
+                    echo "DockerHub secrets not configured, skipping docker login."
+                    exit 0
+                  fi
                   echo $DOCKERHUB_ACCESS_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin
 
             - name: 'Copy dist to the Docker context'
