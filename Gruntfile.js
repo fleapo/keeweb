@@ -3,7 +3,7 @@
 // Filter out --inspect flags from execArgv to prevent them from being passed to child processes
 // This fixes build issues in CI environments where these flags may be present
 // See: https://github.com/gruntjs/grunt-legacy-util - spawn concatenates process.execArgv
-process.execArgv = process.execArgv.filter(arg => !arg.startsWith('--inspect'));
+process.execArgv = process.execArgv.filter((arg) => !arg.startsWith('--inspect'));
 
 const fs = require('fs-extra');
 const path = require('path');
