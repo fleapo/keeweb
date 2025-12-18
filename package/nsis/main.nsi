@@ -143,22 +143,26 @@ Function un.onInit
 
   !insertmacro MULTIUSER_INIT
 
-  ${StrStr} $0 "$EXEPATH" "${PRODUCT_UNINST_TEMP_EXE}"
-  ${If} $0 == ""
-    MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Remove $(^Name) from your computer?" /SD IDYES IDYES yes
-    Abort
-    yes:
-    !insertmacro EnsureAppIsNotRunning
+  StrLen $0 "${PRODUCT_UNINST_TEMP_EXE}"
+  IntOp $1 0 - $0
+  StrCpy $2 "$EXEPATH" $0 $1
+  StrCmp $2 "${PRODUCT_UNINST_TEMP_EXE}" done
 
-    SetOverwrite on
-    CopyFiles "$EXEPATH" "$TEMP\${PRODUCT_UNINST_TEMP_EXE}"
-    ${If} ${Silent}
-      Exec '"$TEMP\${PRODUCT_UNINST_TEMP_EXE}" /S'
-    ${Else}
-      Exec '"$TEMP\${PRODUCT_UNINST_TEMP_EXE}"'
-    ${EndIf}
-    Quit
+  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Remove $(^Name) from your computer?" /SD IDYES IDYES yes
+  Abort
+  yes:
+  !insertmacro EnsureAppIsNotRunning
+
+  SetOverwrite on
+  CopyFiles "$EXEPATH" "$TEMP\${PRODUCT_UNINST_TEMP_EXE}"
+  ${If} ${Silent}
+    Exec '"$TEMP\${PRODUCT_UNINST_TEMP_EXE}" /S'
+  ${Else}
+    Exec '"$TEMP\${PRODUCT_UNINST_TEMP_EXE}"'
   ${EndIf}
+  Quit
+
+  done:
 FunctionEnd
 
 Function un.onUninstSuccess
