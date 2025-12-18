@@ -14,10 +14,8 @@ const FuseConst = {
 const replacements = [
     {
         name: 'Command-line options table',
-        search:
-            /--inspect\0--inspect-brk\0--inspect-port\0--debug\0--debug-brk\0--debug-port\0--inspect-brk-node\0--inspect-publish-uid\0/g,
-        replace:
-            `  inspect\0  inspect-brk\0  inspect-port\0  debug\0  debug-brk\0  debug-port\0  inspect-brk-node\0  ${PatchedSentinel}\0`
+        search: /--inspect\0--inspect-brk\0--inspect-port\0--debug\0--debug-brk\0--debug-port\0--inspect-brk-node\0--inspect-publish-uid\0/g,
+        replace: `  inspect\0  inspect-brk\0  inspect-port\0  debug\0  debug-brk\0  debug-port\0  inspect-brk-node\0  ${PatchedSentinel}\0`
     },
     {
         name: 'Electron option: javascript-harmony',
@@ -158,4 +156,3 @@ function setFuseWireStatus(data, wireId, enabled) {
 }
 
 module.exports = { patchElectronBinaryCompat };
-
