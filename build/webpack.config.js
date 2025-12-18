@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 
 const webpack = require('webpack');
 
@@ -20,6 +21,14 @@ function config(options) {
     const date = options.date;
     const dt = date.toISOString().replace(/T.*/, '');
     const year = date.getFullYear();
+    const supportsMd4 = (() => {
+        try {
+            crypto.createHash('md4');
+            return true;
+        } catch (e) {
+            return false;
+        }
+    })();
     return {
         mode,
         entry: {
@@ -161,7 +170,7 @@ function config(options) {
                     test: /\.js$/,
                     exclude: /(node_modules|babel-helpers\.js)/,
                     loader: 'babel-loader',
-                    options: { cacheDirectory: true }
+                    options: { cacheDirectory: supportsMd4 }
                 },
                 { test: /argon2\.wasm/, type: 'javascript/auto', loader: 'base64-loader' },
                 { test: /argon2(\.min)?\.js/, loader: 'raw-loader' },
@@ -219,7 +228,7 @@ function config(options) {
                 $: 'jquery',
                 babelHelpers: 'babel-helpers'
             }),
-            new webpack.IgnorePlugin(/^(moment)$/),
+            new webpack.IgnorePlugin({ resourceRegExp: /^(moment)$/ }),
             new MiniCssExtractPlugin({
                 filename: 'css/[name].css'
             })
