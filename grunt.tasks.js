@@ -68,9 +68,7 @@ module.exports = function (grunt) {
     grunt.registerTask('build-desktop-archives-linux', ['compress:linux-x64']);
 
     // Modified: Only compress win32-x64
-    grunt.registerTask('build-desktop-archives-win32', [
-        'compress:win32-x64'
-    ]);
+    grunt.registerTask('build-desktop-archives-win32', ['compress:win32-x64']);
 
     grunt.registerTask('build-desktop-archives', [
         'build-desktop-archives-linux',
