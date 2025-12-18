@@ -1,5 +1,6 @@
 module.exports = function (grunt) {
     const sign = !grunt.option('skip-sign');
+    const installer = !grunt.option('skip-installer');
 
     grunt.registerTask('build-web-app', [
         'clean',
@@ -74,6 +75,14 @@ module.exports = function (grunt) {
         sign ? 'sign-exe:win32-build-arm64' : 'noop'
     ]);
 
+    grunt.registerTask('build-desktop-executables-win32-x64', [
+        'electron:win32-x64',
+        'electron-patch:win32-x64',
+        'copy:native-modules-win32-x64',
+        'copy:native-messaging-host-win32-x64',
+        sign ? 'sign-exe:win32-build-x64' : 'noop'
+    ]);
+
     grunt.registerTask('build-desktop-executables', [
         'build-desktop-executables-linux',
         'build-desktop-executables-darwin',
@@ -87,6 +96,8 @@ module.exports = function (grunt) {
         'compress:win32-ia32',
         'compress:win32-arm64'
     ]);
+
+    grunt.registerTask('build-desktop-archives-win32-x64', ['compress:win32-x64']);
 
     grunt.registerTask('build-desktop-archives', [
         'build-desktop-archives-linux',
@@ -111,6 +122,14 @@ module.exports = function (grunt) {
         'copy:desktop-win32-dist-x64',
         'copy:desktop-win32-dist-ia32',
         'copy:desktop-win32-dist-arm64'
+    ]);
+
+    grunt.registerTask('build-desktop-dist-win32-x64', [
+        installer ? 'nsis:win32-un-x64' : 'noop',
+        installer && sign ? 'sign-exe:win32-uninst-x64' : 'noop',
+        installer ? 'nsis:win32-x64' : 'noop',
+        installer && sign ? 'sign-exe:win32-installer-x64' : 'noop',
+        installer ? 'copy:desktop-win32-dist-x64' : 'noop'
     ]);
 
     grunt.registerTask('build-desktop-dist-linux', [

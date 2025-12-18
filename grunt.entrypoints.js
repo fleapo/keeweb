@@ -43,6 +43,14 @@ module.exports = function(grunt) {
         'build-desktop-dist-win32'
     ]);
 
+    grunt.registerTask('desktop-win32-x64', 'Build desktop app on windows (x64 only)', [
+        'clean:desktop',
+        'build-desktop-app-content',
+        'build-desktop-executables-win32-x64',
+        'build-desktop-archives-win32-x64',
+        'build-desktop-dist-win32-x64'
+    ]);
+
     grunt.registerTask('finish-release', 'Complete the release started with desktop-*', [
         'sign-dist'
     ]);
