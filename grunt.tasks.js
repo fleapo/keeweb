@@ -75,8 +75,8 @@ module.exports = function (grunt) {
         'build-desktop-archives-win32'
     ]);
 
-    // Modified: Only build arm64 dmg
-    grunt.registerTask('build-desktop-dist-darwin', ['appdmg:arm64']);
+    // Modified: Skip appdmg - DMG will be created by hdiutil in workflow
+    grunt.registerTask('build-desktop-dist-darwin', []);
 
     // Modified: Only build win32-x64 installer
     grunt.registerTask('build-desktop-dist-win32', [

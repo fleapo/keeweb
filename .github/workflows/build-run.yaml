@@ -120,6 +120,12 @@ jobs:
               run: |
                   grunt --max-old-space-size=4096 desktop-darwin --skip-sign
 
+            - name: 'Create DMG with hdiutil'
+              run: |
+                  mkdir -p dist/desktop
+                  # Create a temporary DMG
+                  hdiutil create -volname "KeeWeb" -srcfolder tmp/desktop/KeeWeb-darwin-arm64/KeeWeb.app -ov -format UDZO dist/desktop/KeeWeb-${{ steps.get_tag.outputs.tag }}.mac.arm64.dmg
+
             - name: 'Upload arm64 dmg artifact'
               uses: actions/upload-artifact@v4
               with:
