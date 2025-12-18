@@ -170,6 +170,8 @@ jobs:
                   npm i -g grunt-cli
 
             - name: 'Grunt'
+              env:
+                  NODE_OPTIONS: ''
               run: |
                   grunt desktop-win32 --skip-sign
 
