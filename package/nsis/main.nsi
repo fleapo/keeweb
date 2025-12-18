@@ -90,7 +90,7 @@ Section "MainSection" SEC01
     ReadRegStr $R0 ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString"
     ${If} $R0 != ""
       CopyFiles "$R0" "$TEMP\${PRODUCT_UNINST_TEMP_EXE}"
-      ExecWait '"$TEMP\${PRODUCT_UNINST_TEMP_EXE}" /S'
+      ExecWait '"$TEMP\${PRODUCT_UNINST_TEMP_EXE}" /S /FROMTEMP'
     ${EndIf}
 
     ReadRegStr $R0 "HKCU" "${PRODUCT_UNINST_KEY}" "QuietUninstallString"
@@ -143,10 +143,12 @@ Function un.onInit
 
   !insertmacro MULTIUSER_INIT
 
-  StrLen $0 "${PRODUCT_UNINST_TEMP_EXE}"
+  ; If started from the copied temp uninstaller, continue without relaunching again.
+  ; We detect it by a dedicated flag to avoid relying on path/filename comparisons.
+  StrLen $0 "/FROMTEMP"
   IntOp $1 0 - $0
-  StrCpy $2 "$EXEPATH" $0 $1
-  StrCmp $2 "${PRODUCT_UNINST_TEMP_EXE}" done
+  StrCpy $2 "$CMDLINE" $0 $1
+  StrCmp /I $2 "/FROMTEMP" done
 
   MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Remove $(^Name) from your computer?" /SD IDYES IDYES yes
   Abort
@@ -156,9 +158,9 @@ Function un.onInit
   SetOverwrite on
   CopyFiles "$EXEPATH" "$TEMP\${PRODUCT_UNINST_TEMP_EXE}"
   ${If} ${Silent}
-    Exec '"$TEMP\${PRODUCT_UNINST_TEMP_EXE}" /S'
+    Exec '"$TEMP\${PRODUCT_UNINST_TEMP_EXE}" /S /FROMTEMP'
   ${Else}
-    Exec '"$TEMP\${PRODUCT_UNINST_TEMP_EXE}"'
+    Exec '"$TEMP\${PRODUCT_UNINST_TEMP_EXE}" /FROMTEMP'
   ${EndIf}
   Quit
 
