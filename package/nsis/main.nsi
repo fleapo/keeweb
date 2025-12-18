@@ -124,6 +124,7 @@ Section -Post
   ${If} $isUpdaterMode == 1
     Exec '"$WINDIR\explorer.exe" "$INSTDIR\${PRODUCT_EXE}"'
   ${Else}
+    WriteUninstaller "$INSTDIR\uninst.exe"
     WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
     WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" '"$INSTDIR\uninst.exe"'
     WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "QuietUninstallString" '"$INSTDIR\uninst.exe" /S'
@@ -133,4 +134,78 @@ Section -Post
     WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
     WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "InstallDir" "$INSTDIR"
   ${EndIf}
+SectionEnd
+
+Function un.onInit
+  ${If} ${IsNativeAMD64}
+    SetRegView 64
+  ${EndIf}
+
+  !insertmacro MULTIUSER_INIT
+
+  ${StrStr} $0 "$EXEPATH" "${PRODUCT_UNINST_TEMP_EXE}"
+  ${If} $0 == ""
+    MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Remove $(^Name) from your computer?" /SD IDYES IDYES yes
+    Abort
+    yes:
+    !insertmacro EnsureAppIsNotRunning
+
+    SetOverwrite on
+    CopyFiles "$EXEPATH" "$TEMP\${PRODUCT_UNINST_TEMP_EXE}"
+    ${If} ${Silent}
+      Exec '"$TEMP\${PRODUCT_UNINST_TEMP_EXE}" /S'
+    ${Else}
+      Exec '"$TEMP\${PRODUCT_UNINST_TEMP_EXE}"'
+    ${EndIf}
+    Quit
+  ${EndIf}
+FunctionEnd
+
+Function un.onUninstSuccess
+  HideWindow
+  MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) was successfully removed from your computer." /SD IDOK
+FunctionEnd
+
+Section "Uninstall"
+  !insertmacro EnsureAppIsNotRunning
+
+  DetailPrint "Removing desktop shortcut"
+  Delete "$DESKTOP\KeeWeb.lnk"
+  DetailPrint "Removing menu shortcut"
+  Delete "$SMPROGRAMS\KeeWeb\KeeWeb.lnk"
+
+  DetailPrint "Removing menu items"
+  RMDir "$SMPROGRAMS\KeeWeb"
+
+  ReadRegStr $R0 ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "InstallDir"
+  ${If} $R0 == ""
+    DetailPrint "InstallDir key is absent"
+    Abort
+  ${EndIf}
+  StrCpy $INSTDIR "$R0"
+
+  ClearErrors
+  DetailPrint "Removing app files from $INSTDIR"
+  Var /GLOBAL deleteRetry
+  ${ForEach} $deleteRetry 1 3 + 1
+    RMDir /r "$INSTDIR"
+    ${If} ${Errors}
+      ClearErrors
+      DetailPrint "Error removing files, retrying in a second"
+      Sleep 1000
+    ${Else}
+      ${ExitFor}
+    ${EndIf}
+  ${Next}
+
+  DetailPrint "Deleting registry keys"
+  DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
+
+  DetailPrint "Unregistering file associations"
+  !insertmacro APP_UNASSOCIATE "kdbx" "kdbxfile"
+  DetailPrint "Updating file associations"
+  !insertmacro UPDATEFILEASSOC
+
+  DetailPrint "Done"
+  SetAutoClose true
 SectionEnd

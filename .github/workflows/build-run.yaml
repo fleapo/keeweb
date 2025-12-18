@@ -450,29 +450,34 @@ jobs:
               run: mkdir -p keeweb/dist/desktop && cp assets/* keeweb/dist/desktop
 
             - name: 'Write secrets'
+              if: ${{ secrets.PRIVATE_KEY != '' && secrets.KEEWEB_SIGN != '' }}
               env:
                   PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
                   KEEWEB_SIGN: ${{ secrets.KEEWEB_SIGN }}
               working-directory: keeweb
               run: |
-                  mkdir keys
-                  echo "$PRIVATE_KEY" > keys/private-key.pem
-                  echo "$KEEWEB_SIGN" > keys/keeweb-sign.json
+                  mkdir -p keys
+                  printf '%s' "$PRIVATE_KEY" > keys/private-key.pem
+                  printf '%s' "$KEEWEB_SIGN" > keys/keeweb-sign.json
 
             - name: 'Grunt'
+              if: ${{ secrets.PRIVATE_KEY != '' && secrets.KEEWEB_SIGN != '' }}
               working-directory: keeweb
               run: |
                   grunt finish-release
 
             - name: 'Copy signatures to assets'
+              if: ${{ secrets.PRIVATE_KEY != '' && secrets.KEEWEB_SIGN != '' }}
               run: |
                   cp keeweb/dist/desktop/Verify.sign.sha256 assets
 
             - name: 'Copy checksums to assets'
+              if: ${{ secrets.PRIVATE_KEY != '' && secrets.KEEWEB_SIGN != '' }}
               run: |
                   cp keeweb/dist/desktop/Verify.sha256 assets
 
             - name: 'Login to DockerHub Registry'
+              if: ${{ github.repository == 'keeweb/keeweb' && secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_ACCESS_TOKEN != '' }}
               env:
                   DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
                   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -480,10 +485,12 @@ jobs:
                   echo $DOCKERHUB_ACCESS_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin
 
             - name: 'Copy dist to the Docker context'
+              if: ${{ github.repository == 'keeweb/keeweb' }}
               run: |
                   cp -r html keeweb/package/docker/dist
 
             - name: 'Build the Docker image'
+              if: ${{ github.repository == 'keeweb/keeweb' }}
               working-directory: keeweb
               run: |
                   docker build -t antelle/keeweb:latest -t antelle/keeweb:${{ steps.get_tag.outputs.tag }} package/docker
@@ -494,8 +501,12 @@ jobs:
                   docker push --all-tags antelle/keeweb
 
             - name: 'Extract release notes'
-              run: node util/extract-release-notes.js --version=${{ steps.get_tag.outputs.tag }} --output=tmp/release-body.md
               working-directory: keeweb
+              run: |
+                  APP_VERSION=$(node -p "require('./package.json').version")
+                  node util/extract-release-notes.js --version=${{ steps.get_tag.outputs.tag }} --output=tmp/release-body.md || \
+                  node util/extract-release-notes.js --version=$APP_VERSION --output=tmp/release-body.md || \
+                  echo "Release v${{ steps.get_tag.outputs.tag }}" > tmp/release-body.md
 
             - name: 'Publish GitHub release'
               uses: softprops/action-gh-release@v1

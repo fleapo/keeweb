@@ -107,12 +107,6 @@ module.exports = function (grunt) {
     grunt.registerTask('build-desktop-dist-darwin', ['appdmg:x64', 'appdmg:arm64']);
 
     grunt.registerTask('build-desktop-dist-win32', [
-        'nsis:win32-un-x64',
-        'nsis:win32-un-ia32',
-        'nsis:win32-un-arm64',
-        sign ? 'sign-exe:win32-uninst-x64' : 'noop',
-        sign ? 'sign-exe:win32-uninst-ia32' : 'noop',
-        sign ? 'sign-exe:win32-uninst-arm64' : 'noop',
         'nsis:win32-x64',
         'nsis:win32-ia32',
         'nsis:win32-arm64',
@@ -125,8 +119,6 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('build-desktop-dist-win32-x64', [
-        installer ? 'nsis:win32-un-x64' : 'noop',
-        installer && sign ? 'sign-exe:win32-uninst-x64' : 'noop',
         installer ? 'nsis:win32-x64' : 'noop',
         installer && sign ? 'sign-exe:win32-installer-x64' : 'noop',
         installer ? 'copy:desktop-win32-dist-x64' : 'noop'
