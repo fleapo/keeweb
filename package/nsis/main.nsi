@@ -148,7 +148,7 @@ Function un.onInit
   StrLen $0 "/FROMTEMP"
   IntOp $1 0 - $0
   StrCpy $2 "$CMDLINE" $0 $1
-  StrCmp /I $2 "/FROMTEMP" done
+  StrCmp $2 "/FROMTEMP" done
 
   MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Remove $(^Name) from your computer?" /SD IDYES IDYES yes
   Abort
